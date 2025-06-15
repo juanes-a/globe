@@ -1,11 +1,13 @@
 <script setup lang="ts">
-  import mapGlobe from "./components/mapGlobe.vue";
+import { computed } from 'vue' // Esto viene de Vue
+import { useRoute } from 'vue-router' // Esto viene de Vue Router
+import NavBar from './components/NavBar.vue'
+
+const route = useRoute()
+const showNavBar = computed(() => route.name !== 'home')
 </script>
 
 <template>
-  <mapGlobe/>
+  <NavBar v-if="showNavBar" />
+  <router-view />
 </template>
-
-<style scoped>
-
-</style>
