@@ -1,80 +1,56 @@
 <template>
   <NavBar :isNavCollapsed="false" />
-  <div class="jungle-container">
-    <!-- Cabecera estilo jungla arcade -->
-    <div class="jungle-header">
-      <h1 class="jungle-title">🐾 Wild Arcade Tracker 🌿</h1>
-      <div class="animal-health-bar">
-        <div class="health-fill"></div>
-        <div class="claw-marks"></div>
+  <div class="container">
+    <h1>WILD ARCADE TRACKER</h1>
+    <div class="subtitle">Track by game, territory or den...</div>
+    
+    <div class="tracker-stats">
+      <div class="stat-line">
+        <span class="stat-label">SCENT:</span>
+        <span class="stat-value">FRESH</span>
+      </div>
+      <div class="stat-line">
+        <span class="stat-label">PREY:</span>
+        <span class="stat-value">{{ filteredPins.length }}</span>
       </div>
     </div>
-
-    <!-- Buscador estilo selvático -->
-    <div class="jungle-search">
-      <div class="vines-top">
-        <div class="banana"></div>
-        <div class="coconut"></div>
-        <div class="mango"></div>
-      </div>
-      <input
-        v-model="searchText"
-        @input="applyFilter"
-        type="text"
-        placeholder=">> Track by game, territory or den..."
-        class="jungle-input"
-      />
-      <div class="vines-bottom">
-        <span class="animal-text">SCENT: FRESH</span>
-        <span class="animal-text">PREY: {{ filteredPins.length }}</span>
-      </div>
+    
+    <div class="divider"></div>
+    
+    <h2 v-if="filteredPins.length === 0">HIBERNATION MODE</h2>
+    <h2 v-else>ACTIVE TRACKS</h2>
+    
+    <div class="no-tracks" v-if="filteredPins.length === 0">
+      No tracks found in this territory
     </div>
-
-    <!-- Lista de pins con estilo animalístico -->
-    <ul class="den-list" v-if="filteredPins && filteredPins.length > 0">
-      <li v-for="pin in filteredPins" :key="pin.id" class="den-item">
-        <div class="paw-border">
-          <div class="den-header">
-            <span class="fur-pattern">PACK {{ Math.floor(Math.random() * 50) + 1 }}</span>
-            <strong class="prey-name">🐾 {{ pin.game }}</strong>
-          </div>
-          
-          <div class="den-content">
-            <p class="animal-text">🌿 <span class="label">Mark:</span> {{ pin.note || 'No mark' }}</p>
-            <p class="animal-text">🐺 <span class="label">Alpha:</span> {{ pin.username }}</p>
-            <p class="animal-text">🗺️ <span class="label">Territory:</span> {{ pin.location?.country || 'Unknown' }}</p>
-            <p class="animal-text">🏞️ <span class="label">Den:</span> {{ pin.location?.city || 'Unknown' }}</p>
-            <p class="animal-text">📍 <span class="label">Trail:</span> 
-              {{ pin.lat ? Number(pin.lat).toFixed(4) : 'N/A' }}, 
-              {{ pin.lng ? Number(pin.lng).toFixed(4) : 'N/A' }}
-            </p>
-          </div>
-          
-          <div class="den-footer">
-            <span class="animal-text">STRENGTH: ▮▮▮▮▮ 100%</span>
-            <button class="paw-button">FOLLOW TRAIL</button>
-          </div>
+    
+    <ul class="track-list" v-else>
+      <li v-for="pin in filteredPins" :key="pin.id" class="track-item">
+        <div class="track-header">
+          <span class="track-id">ID: {{ Math.floor(Math.random() * 9000) + 1000 }}</span>
+          <strong class="game-name">{{ pin.game }}</strong>
+        </div>
+        
+        <div class="track-content">
+          <p><span class="label">NOTE:</span> {{ pin.note || 'No note' }}</p>
+          <p><span class="label">USER:</span> {{ pin.username }}</p>
+          <p><span class="label">LOCATION:</span> 
+            {{ pin.location?.city || 'Unknown' }}, 
+            {{ pin.location?.country || 'Unknown' }}
+          </p>
+          <p><span class="label">COORDINATES:</span> 
+            {{ pin.lat ? Number(pin.lat).toFixed(4) : 'N/A' }}, 
+            {{ pin.lng ? Number(pin.lng).toFixed(4) : 'N/A' }}
+          </p>
         </div>
       </li>
     </ul>
-
-    <!-- Pantalla de hibernación cuando no hay resultados -->
-    <div class="hibernation-screen" v-else>
-      <div class="hibernation-content">
-        <h2>HIBERNATION MODE</h2>
-        <p class="animal-text">No tracks found in this territory</p>
-        <button class="paw-button" @click="resetSearch">HUNT AGAIN?</button>
-      </div>
-    </div>
-
-    <!-- Huellas animales decorativas -->
-    <div class="paw-print top-left">🐾</div>
-    <div class="paw-print top-right">🐾</div>
-    <div class="paw-print bottom-left">🐾</div>
-    <div class="paw-print bottom-right">🐾</div>
     
-    <!-- Efecto de follaje -->
-    <div class="jungle-foliage"></div>
+    <button class="hunt-again" @click="resetSearch">HUNT AGAIN?</button>
+    
+    <div class="particles">
+      <div v-for="i in 30" :key="i" class="particle" :style="particleStyle(i)"></div>
+    </div>
   </div>
 </template>
 
@@ -141,326 +117,312 @@ function resetSearch() {
   searchText.value = ''
   applyFilter()
 }
+
+function particleStyle(i: number) {
+  const colors = ['#003d66', '#005a8c', '#007acc', '#004080']
+  const size = Math.random() * 2 + 1
+  const color = colors[Math.floor(Math.random() * colors.length)]
+  
+  return {
+    width: `${size}px`,
+    height: `${size}px`,
+    left: `${Math.random() * 100}%`,
+    top: `${Math.random() * 100}%`,
+    backgroundColor: color,
+    animation: `move${Math.floor(Math.random() * 3) + 1} ${Math.random() * 10 + 10}s linear infinite`
+  }
+}
 </script>
 
-<style scoped>
-/* Estilo general jungla/animalístico */
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rubik+Bubbles&display=swap');
-
-* {
-  box-sizing: border-box;
-}
-
-.jungle-container {
-  position: relative;
-  margin-top: 39px;
-  padding: 30px;
-  background-color: #0d1a0d;
-  background-image: radial-gradient(#1e3a1e 1px, transparent 1px);
-  background-size: 20px 20px;
-  color: #e6e6e6;
-  min-height: 100vh;
-  font-family: 'Courier New', monospace;
-  border: 8px solid #3a2c18;
-  box-shadow: inset 0 0 30px #000;
-  overflow: hidden;
-}
-
-.jungle-header {
-  text-align: center;
-  margin-bottom: 30px;
-  position: relative;
-}
-
-.jungle-title {
-  font-family: 'Rubik Bubbles', cursive;
-  color: #f0a830;
-  text-shadow: 3px 3px 0 #8b4513, 6px 6px 0 #5a3921;
-  margin-bottom: 20px;
-  font-size: 2.5rem;
-  letter-spacing: 2px;
-}
-
-.animal-health-bar {
-  height: 16px;
-  background: #3a2c18;
-  border-radius: 8px;
-  margin: 0 auto;
-  max-width: 500px;
-  border: 2px solid #5a3921;
-  box-shadow: 0 0 10px #8b4513;
-  position: relative;
-  overflow: hidden;
-}
-
-.health-fill {
+<style>
+/* Fondo global negro */
+body, html {
+  background-color: #000 !important;
+  margin: 0;
+  padding: 0;
   height: 100%;
-  width: 100%;
-  background: linear-gradient(90deg, #ff4500, #ff8c00, #32cd32);
-  border-radius: 6px;
+}
+</style>
+
+<style scoped>
+.container {
+  font-family: 'Orbitron', sans-serif;
+  background-color: rgba(0, 10, 20, 0.7);
+  color: #007acc;
+  margin: 39px auto 0;
+  margin-top: 70px;
+  padding: 30px;
+  max-width: 800px;
+  border: 2px solid #007acc;
+  box-shadow: 0 0 20px #005a8c, 0 0 40px #003d66;
+  position: relative;
+  overflow: hidden;
+  background-image: 
+    radial-gradient(circle at 20% 30%, rgba(0, 80, 120, 0.15) 0%, transparent 30%),
+    radial-gradient(circle at 80% 70%, rgba(0, 150, 200, 0.15) 0%, transparent 30%);
 }
 
-.claw-marks {
+.container::before {
+  content: "";
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  right: -10px;
+  bottom: -10px;
+  border: 1px solid #007acc;
+  animation: pulse 4s infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.3; }
+  100% { opacity: 0.8; }
+}
+
+h1 {
+  color: #007acc;
+  font-size: 2.5rem;
+  margin: 0 0 10px 0;
+  text-shadow: 0 0 10px #005a8c, 0 0 20px #003d66;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  position: relative;
+  display: inline-block;
+}
+
+h1::after {
+  content: "";
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #007acc, transparent);
+  box-shadow: 0 0 10px #005a8c;
+}
+
+.subtitle {
+  color: #4d9fcc;
+  font-style: italic;
+  margin-bottom: 30px;
+  font-size: 1.1rem;
+  text-shadow: 0 0 5px #005a8c;
+}
+
+.tracker-stats {
+  margin: 30px 0;
+  font-size: 1.3rem;
+}
+
+.stat-line {
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+}
+
+.stat-label {
+  color: #007acc;
+  font-weight: bold;
+  margin-right: 15px;
+  min-width: 100px;
+}
+
+.stat-value {
+  color: #4d9fcc;
+  text-shadow: 0 0 5px #005a8c;
+}
+
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #007acc, transparent);
+  margin: 40px 0;
+  box-shadow: 0 0 10px #005a8c;
+}
+
+h2 {
+  color: #007acc;
+  font-size: 1.8rem;
+  margin-bottom: 25px;
+  text-shadow: 0 0 10px #005a8c;
+  letter-spacing: 2px;
+  position: relative;
+}
+
+h2::before {
+  content: "◢";
+  margin-right: 10px;
+  color: #005a8c;
+}
+
+.no-tracks {
+  margin: 30px 0;
+  color: #4d9fcc;
+  font-style: italic;
+  font-size: 1.2rem;
+  text-align: center;
+  padding: 15px;
+  border: 1px dashed #005a8c;
+  background-color: rgba(0, 25, 40, 0.4);
+}
+
+.track-list {
+  list-style: none;
+  padding: 0;
+  margin: 30px 0;
+}
+
+.track-item {
+  margin-bottom: 25px;
+  border: 1px solid #005a8c;
+  padding: 15px;
+  background-color: rgba(0, 15, 30, 0.5);
+  position: relative;
+  overflow: hidden;
+}
+
+.track-item::before {
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5 5h2v2H5zM8 8h2v2H8zM11 11h2v2h-2zM14 14h2v2h-2z' fill='%23000' opacity='0.2'/%3E%3C/svg%3E");
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(0, 90, 140, 0.1),
+    transparent
+  );
+  transform: translateX(-100%);
+  transition: transform 0.6s;
 }
 
-/* Estilo para el buscador jungla */
-.jungle-search {
-  background: #1e3a1e;
-  border: 4px solid #5a3921;
-  border-radius: 8px;
-  padding: 10px;
-  max-width: 600px;
-  margin: 0 auto 30px;
-  box-shadow: 0 0 15px rgba(139, 69, 19, 0.5);
-  position: relative;
+.track-item:hover::before {
+  transform: translateX(100%);
 }
 
-.vines-top {
-  display: flex;
-  gap: 15px;
-  margin-bottom: 10px;
-  justify-content: center;
-}
-
-.banana, .coconut, .mango {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-}
-
-.banana {
-  background: #ffd700;
-  box-shadow: 0 0 5px #ffd700;
-}
-
-.coconut {
-  background: #8b4513;
-  box-shadow: 0 0 5px #8b4513;
-}
-
-.mango {
-  background: #ff4500;
-  box-shadow: 0 0 5px #ff4500;
-}
-
-.jungle-input {
-  width: 100%;
-  padding: 12px;
-  font-size: 16px;
-  background: #0d1a0d;
-  color: #f0a830;
-  border: 2px solid #5a3921;
-  font-family: 'Courier New', monospace;
-  margin-bottom: 10px;
-  border-radius: 4px;
-}
-
-.jungle-input::placeholder {
-  color: #5a3921;
-  font-style: italic;
-}
-
-.jungle-input:focus {
-  outline: none;
-  border-color: #f0a830;
-  box-shadow: 0 0 10px #f0a830;
-}
-
-.vines-bottom {
-  display: flex;
-  justify-content: space-between;
-  font-size: 12px;
-  color: #f0a830;
-  padding: 0 5px;
-}
-
-/* Estilo para la lista de guaridas */
-.den-list {
-  list-style: none;
-  padding: 0;
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-.den-item {
-  margin-bottom: 25px;
-  transition: transform 0.3s;
-}
-
-.den-item:hover {
-  transform: translateY(-5px);
-}
-
-.paw-border {
-  border: 4px solid #5a3921;
-  border-image: repeating-linear-gradient(45deg, #8b4513, #f0a830, #8b4513, #f0a830) 10;
-  padding: 15px;
-  background: rgba(13, 26, 13, 0.8);
-  position: relative;
-  border-radius: 8px;
-}
-
-.den-header {
+.track-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 15px;
-  border-bottom: 2px dashed #5a3921;
   padding-bottom: 10px;
+  border-bottom: 1px dashed #005a8c;
 }
 
-.fur-pattern {
-  background: #8b4513;
-  color: #f0a830;
-  padding: 3px 8px;
-  font-size: 12px;
-  font-family: 'Press Start 2P', cursive;
-  border-radius: 4px;
+.track-id {
+  color: #007acc;
+  font-size: 0.9rem;
+  opacity: 0.7;
 }
 
-.prey-name {
-  color: #f0a830;
+.game-name {
+  color: #4d9fcc;
   font-size: 1.3rem;
-  text-shadow: 2px 2px 0 #8b4513;
-  font-family: 'Rubik Bubbles', cursive;
+  text-shadow: 0 0 5px #005a8c;
 }
 
-.den-content {
-  margin-bottom: 15px;
+.track-content {
+  color: #4d9fcc;
+  font-size: 0.95rem;
+  line-height: 1.6;
 }
 
-.animal-text {
+.track-content p {
   margin: 8px 0;
-  color: #e6e6e6;
-  font-size: 14px;
 }
 
 .label {
-  color: #32cd32;
+  color: #007acc;
   font-weight: bold;
+  margin-right: 5px;
 }
 
-.den-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-top: 2px dashed #5a3921;
-  padding-top: 10px;
-}
-
-/* Estilo para botones de pata */
-.paw-button {
-  background: #5a3921;
-  color: #f0a830;
-  border: none;
-  padding: 8px 15px;
-  font-family: 'Press Start 2P', cursive;
-  font-size: 12px;
-  cursor: pointer;
-  position: relative;
+.hunt-again {
+  display: inline-block;
+  margin-top: 30px;
+  padding: 12px 25px;
+  background: linear-gradient(135deg, #003d66, #005a8c);
+  color: #000;
+  font-weight: bold;
+  font-size: 1.2rem;
   text-transform: uppercase;
-  border-radius: 20px;
+  letter-spacing: 2px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
   transition: all 0.3s;
+  box-shadow: 0 0 15px #003d66;
+  position: relative;
+  overflow: hidden;
+  font-family: 'Orbitron', sans-serif;
 }
 
-.paw-button:hover {
-  background: #8b4513;
-  color: #ffd700;
-  transform: scale(1.05);
+.hunt-again:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 0 25px #005a8c;
 }
 
-.paw-button:active {
-  transform: scale(0.95);
-}
-
-/* Pantalla de hibernación */
-.hibernation-screen {
-  background: rgba(13, 26, 13, 0.9);
-  border: 4px solid #8b4513;
-  padding: 30px;
-  text-align: center;
-  max-width: 500px;
-  margin: 50px auto;
-  border-radius: 10px;
-}
-
-.hibernation-screen h2 {
-  color: #f0a830;
-  font-family: 'Rubik Bubbles', cursive;
-  font-size: 2.5rem;
-  margin-bottom: 20px;
-  text-shadow: 3px 3px 0 #8b4513;
-}
-
-/* Huellas decorativas */
-.paw-print {
+.hunt-again::before {
+  content: "";
   position: absolute;
-  font-size: 24px;
-  opacity: 0.3;
-  z-index: 1;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    to bottom right,
+    transparent 45%,
+    rgba(255, 255, 255, 0.3) 50%,
+    transparent 55%
+  );
+  transform: rotate(30deg);
+  animation: shine 3s infinite;
 }
 
-.top-left {
-  top: 20px;
-  left: 20px;
+@keyframes shine {
+  0% { transform: translateX(-100%) rotate(30deg); }
+  100% { transform: translateX(100%) rotate(30deg); }
 }
 
-.top-right {
-  top: 20px;
-  right: 20px;
-}
-
-.bottom-left {
-  bottom: 20px;
-  left: 20px;
-}
-
-.bottom-right {
-  bottom: 20px;
-  right: 20px;
-}
-
-/* Follaje decorativo */
-.jungle-foliage {
+.particle {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 10 Q 20 0, 30 10 T 50 10 T 70 10 T 90 10' stroke='%231e3a1e' fill='none' stroke-width='2'/%3E%3C/svg%3E");
-  background-size: 200px 200px;
+  background-color: #005a8c;
+  border-radius: 50%;
   pointer-events: none;
-  z-index: 0;
-  opacity: 0.1;
+  opacity: 0.6;
 }
 
-/* Animaciones */
-@keyframes growl {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-5px); }
+@keyframes move1 {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(30px, -20px); }
 }
 
-.den-item:hover {
-  animation: growl 0.5s infinite;
+@keyframes move2 {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(-40px, 15px); }
 }
 
-/* Responsive */
+@keyframes move3 {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(25px, 30px); }
+}
+
 @media (max-width: 768px) {
-  .jungle-title {
+  .container {
+    padding: 20px;
+    margin: 39px 20px 0;
+  }
+  
+  h1 {
     font-size: 1.8rem;
   }
   
-  .jungle-container {
-    padding: 20px;
+  .tracker-stats {
+    font-size: 1.1rem;
   }
   
-  .prey-name {
+  .game-name {
     font-size: 1.1rem;
   }
 }
